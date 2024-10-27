@@ -1,4 +1,6 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -24,15 +26,18 @@ namespace Test.Application.Services
     {
         private readonly IValidator<UserCreationDTO> _userCreationValidator;
         private readonly IValidator<UserUpdateDTO> _updateUserRoleValidator;
-
+        private readonly IMemoryCache _cache;
         private readonly IUserRepository _userRepository;
+        private readonly IHubNotifier _hubNotifierService;
 
-        public UserService(IUserRepository userRepository, IValidator<UserCreationDTO> userCreationValidator, IValidator<UserUpdateDTO> updateUserRoleValidator)
+
+        public UserService(IUserRepository userRepository, IValidator<UserCreationDTO> userCreationValidator, IValidator<UserUpdateDTO> updateUserRoleValidator, IMemoryCache cache, IHubNotifier hubNotifierService)
         {
             _userRepository = userRepository;
             _userCreationValidator = userCreationValidator;
             _updateUserRoleValidator = updateUserRoleValidator;
-
+            _cache = cache;
+            _hubNotifierService = hubNotifierService;
         }
 
         public async Task<string> CreateUserAsync(string name, string email, string password, string role)
@@ -69,6 +74,41 @@ namespace Test.Application.Services
           return await _userRepository.GetUsersAsync();
         }
 
+       public async Task<(bool IsValid, List<string> Errors)> ValidateUserNotifyAsync(UserNotifyUpdateDTO dto)
+        {
+            var errors = new List<string>();
+
+            var user = (await _userRepository.GetUsersAsync()).FirstOrDefault(x => x.Email == dto.Email);
+
+            if (user == null)
+            {
+                errors.Add("Korisnik sa ovim Email-om ne postoji.");
+            }
+            else if (!_cache.TryGetValue(user.Id.ToString(), out string connectionId) || string.IsNullOrEmpty(connectionId))
+            {
+                errors.Add("Korisnik nije zabelezen u cache, konektujete se prvo.");
+            }
+
+            return (errors.Count == 0, errors);
+        }
+
+
+
+        public async Task<string> NotifyUserAsync(UserNotifyUpdateDTO dto)
+        {
+            var users =  await _userRepository.GetUsersAsync();
+            var user = users.FirstOrDefault(x => x.Email == dto.Email);
+            if (_cache.TryGetValue(user.Id.ToString(), out string connectionId))
+            {
+                await _hubNotifierService.NotifyUser(dto.Message, connectionId);
+                return "Notifikacija je poslata";
+
+            }
+
+            return "Notifikacija je neuspesno poslata";
+
+        }
+
         public async Task<string> UpdateUserRoleAsync(int userId, string newRole)
         {
             var result = await _userRepository.UpdateUserRoleAsync(userId, newRole);
@@ -92,5 +132,7 @@ namespace Test.Application.Services
             var errors = result.IsValid ? new List<string>() : result.Errors.Select(x => x.ErrorMessage).ToList();
             return (result.IsValid, errors);
         }
+
+       
     }
 }

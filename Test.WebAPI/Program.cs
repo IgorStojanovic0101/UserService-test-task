@@ -14,6 +14,8 @@ using Test.Infrastructure;
 using Test.WebAPI.Hubs;
 using Test.WebAPI.Utilities.middlewares;
 using Test.WebAPI.Utilities;
+using Test.Application.Abstraction;
+using Test.WebAPI.Notifiers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,13 +30,13 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 
-
+builder.Services.AddSignalR();
 
 builder.Services.AddApplication(builder.Configuration);
 builder.Services.AddInfrastructure(builder.Configuration);
 
+builder.Services.AddScoped<IHubNotifier, HubNotifier>();
 
-builder.Services.AddSignalR();
 
 
 builder.Services.AddMvc(options => options.Conventions.Add(new RouteConvention()));
@@ -60,7 +62,8 @@ builder.Services.AddLogging(loggingBuilder =>
     loggingBuilder.AddSerilog(logger);
 });
 
-
+builder.Services.AddMemoryCache(); 
+builder.Services.AddHttpContextAccessor(); 
 
 builder.Services.AddCors(options =>
 {

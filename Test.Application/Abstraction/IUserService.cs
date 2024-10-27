@@ -17,6 +17,10 @@ namespace Test.Application.Abstraction
 
         Task<IEnumerable<UserModel>> GetUsersAsync();
         Task<string> UpdateUserRoleAsync(int userId, string newRole);
+        Task<string> NotifyUserAsync(UserNotifyUpdateDTO dto);
+
+        Task<(bool IsValid, List<string> Errors)> ValidateUserNotifyAsync(UserNotifyUpdateDTO dto);
+
 
     }
 }
