@@ -11,6 +11,10 @@ namespace Test.Application.Abstraction
     public interface IUserService
     {
         Task<string> CreateUserAsync(string name, string email, string password, string role);
+
+        Task<(bool IsValid, List<string> Errors)> CreateUserValidator(UserCreationDTO dto);
+        Task<(bool IsValid, List<string> Errors)> UpdateUserValidator(UserUpdateDTO dto);
+
         Task<IEnumerable<UserModel>> GetUsersAsync();
         Task<string> UpdateUserRoleAsync(int userId, string newRole);
 

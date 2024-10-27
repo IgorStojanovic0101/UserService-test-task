@@ -4,6 +4,7 @@ using Test.Application.Abstraction;
 using Test.Application.DTOs.User;
 using Test.Application.Results;
 using Test.Domain.Entities;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Test.WebAPI.Controllers
 {
@@ -35,6 +36,15 @@ namespace Test.WebAPI.Controllers
         {
             ServiceResponse<string> response = new();
 
+            var (isValid,Errors) = await _service.CreateUserValidator(dto);
+
+            response.Success = isValid;
+
+            if (!isValid)
+            {
+                response.Errors = Errors;
+                return Ok(response);
+            }
 
             response.Payload = await _service.CreateUserAsync(dto.Name,dto.Email,dto.Password,dto.Role);
 
@@ -47,7 +57,16 @@ namespace Test.WebAPI.Controllers
         {
             ServiceResponse<string> response = new();
 
-            response.Payload = await _service.UpdateUserRoleAsync(dto.UserId,dto.RoleId);
+            var (isValid, Errors) = await _service.UpdateUserValidator(dto);
+            response.Success = isValid;
+
+            if (!isValid)
+            {
+                response.Errors = Errors;
+                return Ok(response);
+            }
+
+            response.Payload = await _service.UpdateUserRoleAsync(dto.UserId,dto.Role);
 
             return Ok(response);
 

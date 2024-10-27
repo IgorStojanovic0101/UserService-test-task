@@ -11,6 +11,6 @@ namespace Test.Application.DTOs.User
     public record UserUpdateDTO
     (
          int UserId,
-         string RoleId
+         string Role
     );
 }

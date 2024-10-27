@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using FluentValidation;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -21,12 +22,18 @@ namespace Test.Application.Services
 {
     public class UserService : IUserService
     {
+        private readonly IValidator<UserCreationDTO> _userCreationValidator;
+        private readonly IValidator<UserUpdateDTO> _updateUserRoleValidator;
 
         private readonly IUserRepository _userRepository;
 
-        public UserService(IUserRepository userRepository) => _userRepository = userRepository;
+        public UserService(IUserRepository userRepository, IValidator<UserCreationDTO> userCreationValidator, IValidator<UserUpdateDTO> updateUserRoleValidator)
+        {
+            _userRepository = userRepository;
+            _userCreationValidator = userCreationValidator;
+            _updateUserRoleValidator = updateUserRoleValidator;
 
-        
+        }
 
         public async Task<string> CreateUserAsync(string name, string email, string password, string role)
         {
@@ -46,6 +53,16 @@ namespace Test.Application.Services
             }
 
         }
+
+
+        public async Task<(bool IsValid, List<string> Errors)> CreateUserValidator(UserCreationDTO dto)
+        {
+            var result = await _userCreationValidator.ValidateAsync(dto);
+            var errors = result.IsValid ? new List<string>() : result.Errors.Select(x => x.ErrorMessage).ToList();
+            return (result.IsValid, errors);
+        }
+
+
 
         public async Task<IEnumerable<UserModel>> GetUsersAsync()
         {
@@ -67,6 +84,13 @@ namespace Test.Application.Services
                     return "Doslo je do greske";
             }
 
+        }
+
+        public async Task<(bool IsValid, List<string> Errors)> UpdateUserValidator(UserUpdateDTO dto)
+        {
+            var result = await _updateUserRoleValidator.ValidateAsync(dto);
+            var errors = result.IsValid ? new List<string>() : result.Errors.Select(x => x.ErrorMessage).ToList();
+            return (result.IsValid, errors);
         }
     }
 }
