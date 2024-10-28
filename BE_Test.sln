@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test.Infrastructure", "Test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test.Domain", "Test.Domain\Test.Domain.csproj", "{6CCAB218-A2A7-4FB6-8095-279AAE56BA07}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.UnitTesting", "Test.UnitTesting\Test.UnitTesting.csproj", "{2541A166-ECAD-463C-B572-CD7E222BE709}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{6CCAB218-A2A7-4FB6-8095-279AAE56BA07}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6CCAB218-A2A7-4FB6-8095-279AAE56BA07}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6CCAB218-A2A7-4FB6-8095-279AAE56BA07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2541A166-ECAD-463C-B572-CD7E222BE709}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2541A166-ECAD-463C-B572-CD7E222BE709}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2541A166-ECAD-463C-B572-CD7E222BE709}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2541A166-ECAD-463C-B572-CD7E222BE709}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -100,8 +100,11 @@ namespace Test.Application.Services
             var user = users.FirstOrDefault(x => x.Email == dto.Email);
             if (_cache.TryGetValue(user.Id.ToString(), out string connectionId))
             {
-                await _hubNotifierService.NotifyUser(dto.Message, connectionId);
-                return "Notifikacija je poslata";
+                if (!string.IsNullOrEmpty(connectionId))
+                {
+                    await _hubNotifierService.NotifyUser(dto.Message, connectionId);
+                    return "Notifikacija je poslata";
+                }
 
             }
 
